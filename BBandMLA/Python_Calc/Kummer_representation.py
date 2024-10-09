@@ -13,11 +13,8 @@ import scipy.special as ss
 
 E0 = 1
 
-def integrand(t, Z, rho0, k):
-    return(t*np.exp(-t**2/4*(1+1j*Z))*np.cos(t*rho0)*(t/2)**(2*k))        
-
 Z = 0
-k = 0
+k = 1
 rho0_list = np.linspace(-2,2,200)
 
 x3 = -rho0_list**2/(1+1j*Z)
