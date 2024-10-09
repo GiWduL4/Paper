@@ -38,5 +38,6 @@ plt.grid(True)
 ax.set_xlabel(r'$\rho_0$')
 ax.set_ylabel('value')
 ax.plot(rho0_list, H, label = r'integral real')
-ax.plot(rho0_list, H, label = r'integral imag')
-                        
+ax.plot(rho0_list, K, label = r'integral imag')
+plt.legend(loc = 'best', prop = {'size':15})
+plt.show()
