@@ -11,6 +11,8 @@ import math as m
 import matplotlib.pyplot as plt
 import scipy.special as ss
 from decimal import Decimal
+from mpmath import nsum, inf, fac
+
 
 # Defining pathes for importing own modules
 import sys
@@ -41,7 +43,7 @@ def B0_pre(rho0):
         x3 = -r**2
         print(x3)
         for k in range(k_max):
-            B0_prefactor[i, k] = Decimal(ss.hyp1f1(k+1, 1/2, x3)) / Decimal(m.factorial(k))
+            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) /fac(k)
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B0_prefactor.shape[0] == 1:
@@ -66,7 +68,7 @@ def B2_pre(rho0):
     for i, r in enumerate(rho0):
         x3 = -r**2
         for k in range(k_max):
-            B2_prefactor[i, k] = Decimal(ss.hyp1f1(k+2, 3/2, x3)) / Decimal(m.factorial(k))
+            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) /fac(k)
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B2_prefactor.shape[0] == 1:
