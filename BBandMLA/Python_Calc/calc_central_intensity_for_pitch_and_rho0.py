@@ -22,16 +22,13 @@ import graphical_analysis as ga
 E0 = 1       
 
 n = 500
-k_max = 120
+k_max = 100
 
 Z = 0
-<<<<<<<< HEAD:BBandMLA/Python_Calc/calc_BB_focalplane.py
-p_list = [1]#np.linspace(0,5.5,500)
-rho0 = [1.5]#np.linspace(0.5,5,n)
-========
+
 p_list = np.linspace(0,5,500)
 rho0 = np.linspace(0.8,5,n)
->>>>>>>> claculatefordifferentarrayarrangements:BBandMLA/Python_Calc/calc_central_intensity_for_pitch_and_rho0.py
+
 """
 B0 and B2; case Z = 0
 """
@@ -44,7 +41,7 @@ def B0_pre(rho0):
     
     for i, r in enumerate(rho0):
         x3 = -r**2
-        print(x3)
+        # print(x3)
         for k in range(k_max):
             B0_prefactor[i, k] = Decimal(ss.hyp1f1(k+1, 1/2, x3)) / Decimal(m.factorial(k))
     
@@ -125,47 +122,28 @@ B0pre = B0_pre(rho0)
 B2pre = B2_pre(rho0)
 print('prefactors calculated')
 
-<<<<<<<< HEAD:BBandMLA/Python_Calc/calc_BB_focalplane.py
-# I0 = intensity(E_field(0,0))
-# Icross = np.zeros((len(rho0),len(p_list)))
-# step = 0
-# for j, p in enumerate(p_list):
-#     Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
-#     Icross[:,j] = intensity(Ecross)
-#     progress = (j+1)/len(p_list)
-#     if progress >= step:
-#         print('Progress: ' + str(round(progress*100,3)) + ' %')
-#         step += 0.1
-========
 I0 = intensity(E_field(0,0))
 Icross = np.zeros((len(rho0),len(p_list)))
 step = 0
 for j, p in enumerate(p_list):
-    Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p) + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
+    Ecross =( E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p) 
+    + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
+    + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
+    + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
+    + E_field(p,2*p) + E_field(-p,-2*p) + E_field(-p,2*p) + E_field(p,-2*p))
     Icross[:,j] = intensity(Ecross)
     progress = (j+1)/len(p_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
->>>>>>>> claculatefordifferentarrayarrangements:BBandMLA/Python_Calc/calc_central_intensity_for_pitch_and_rho0.py
     
 
 """
 Plot
 """
-x = np.linspace(-4,4,200)
-y = np.linspace(-4,4,200)
-xm, ym = np.meshgrid(x,y)
-
-p = 1.
-
-I0 = intensity(E_field(xm,ym))
-E = E_field(xm,ym) + E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
-Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 18)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-# ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
+ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
