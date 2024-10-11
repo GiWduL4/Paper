@@ -21,7 +21,7 @@ def integrand_imag(t, Z, rho0, k):
 n = 400
 
 Z = 0
-k = 1
+k = 30
 rho0_list = np.linspace(0,10,n)
 """
 Integral
@@ -29,12 +29,12 @@ Integral
 H = np.zeros(n)
 K = np.zeros(n)
 
-# for j in range(n):
-#     rho0 = rho0_list[j]
-#     result0 = integrate.quad(integrand_real, 0, np.inf, args = (Z,rho0,k))
-#     H[j] = 1/(m.factorial(k)) * result0[0]
-#     result1 = integrate.quad(integrand_imag, 0, np.inf, args = (Z,rho0,k))
-#     K[j] = 1/(m.factorial(k)) * result1[0]
+for j in range(n):
+    rho0 = rho0_list[j]
+    result0 = integrate.quad(integrand_real, 0, np.inf, args = (Z,rho0,k))
+    H[j] = 1/(m.factorial(k)) * result0[0]
+    result1 = integrate.quad(integrand_imag, 0, np.inf, args = (Z,rho0,k))
+    K[j] = 1/(m.factorial(k)) * result1[0]
 
 """
 Kummer
@@ -53,8 +53,8 @@ fig, ax = plt.subplots()
 plt.grid(True)
 ax.set_xlabel(r'$\rho_0$')
 ax.set_ylabel('value')
-# ax.plot(rho0_list, H, 'c-', label = r'integral real')
-# ax.plot(rho0_list, K, 'b-', label = r'integral imag')
+ax.plot(rho0_list, H, 'c-', label = r'integral real')
+ax.plot(rho0_list, K, 'b-', label = r'integral imag')
 ax.plot(rho0_list, M, 'm-.', label = r'Kummer real')
 ax.plot(rho0_list, N, 'r-.', label = r'Kummer imag')
 plt.legend(loc = 'best', prop = {'size':15})
