@@ -14,18 +14,18 @@ import scipy.special as ss
 # Defining pathes for importing own modules
 import sys
 sys.path.insert(1, "C:/Users/Ludwig/OneDrive/Dokumente/GitKraken/ATOMICS-python-modules/basic-modules/")
-sys.path.insert(1, "//brain43/groups/Atomics/ATOMICS-python-modules/basic-modules")
+# sys.path.insert(1, "//brain43/groups/Atomics/ATOMICS-python-modules/basic-modules")
 
 import graphical_analysis as ga
 
 E0 = 1       
 
-n = 100
-k_max = 60
+n = 500
+k_max = 160
 
 Z = 0
-p_list = np.linspace(0,4.5,100)
-rho0 = np.linspace(0.8,5,n)
+p_list = np.linspace(0,5.5,500)
+rho0 = np.linspace(0.5,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -74,7 +74,7 @@ def B2_pre(rho0):
 def B2_calc(r2):
     B2 = 0
     for k in range(k_max):
-        B2 += B2_pre[:,k]*(-r2)**k 
+        B2 += B2pre[:,k]*(-r2)**k 
         # print(type(B0))
     B2 = 2 * B2
     return(B2)
@@ -84,11 +84,11 @@ def B2_calc(r2):
 def E_field(x,y):
     E = [0,0]
     r2 = x**2 + y**2
-    B0 = B0_calc(r2, rho0)
-    B2 = B2_calc(r2, rho0)
+    B0 = B0_calc(r2)
+    B2 = B2_calc(r2)
     E[0] = B0 + B2*x + 1j*B2*y
     E[1] = B2*y + 1j* B0 -1j*B2*x
-    return(E)
+    return(np.array(E))
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
@@ -116,15 +116,18 @@ def intensity(Efield):
 
 B0pre = B0_pre(rho0)
 B2pre = B2_pre(rho0)
-print('prefactor calculated')
+print('prefactors calculated')
 
 I0 = intensity(E_field(0,0))
 Icross = np.zeros((len(rho0),len(p_list)))
-
+step = 0
 for j, p in enumerate(p_list):
-    print(j)
     Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
     Icross[:,j] = intensity(Ecross)
+    progress = (j+1)/len(p_list)
+    if progress >= step:
+        print('Progress: ' + str(round(progress*100,3)) + ' %')
+        step += 0.1
     
 
 """
@@ -132,7 +135,7 @@ Plot
 """
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 0.5)
+ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
