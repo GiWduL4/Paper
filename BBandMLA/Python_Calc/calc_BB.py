@@ -46,10 +46,10 @@ def B0_pre(rho0):
         return B0_prefactor[0]
     return B0_prefactor
 
-def B0_calc(r2, rh0):
+def B0_calc(r2):
     B0 = 0
     for k in range(k_max):
-        B0 += B0_pre(rho0)[:,k]*(-r2)**k 
+        B0 += B0pre[:,k]*(-r2)**k 
         # print(type(B0))
     B0 = 2 * B0
     return(B0)
@@ -71,10 +71,10 @@ def B2_pre(rho0):
         return B2_prefactor[0]
     return B2_prefactor
 
-def B2_calc(r2, rh0):
+def B2_calc(r2):
     B2 = 0
     for k in range(k_max):
-        B2 += B2_pre(rho0)[:,k]*(-r2)**k 
+        B2 += B2_pre[:,k]*(-r2)**k 
         # print(type(B0))
     B2 = 2 * B2
     return(B2)
@@ -114,10 +114,15 @@ def intensity(Efield):
 # I0 = B00**2
 # Icross = (B00+4*B01)**2
 
+B0pre = B0_pre(rho0)
+B2pre = B2_pre(rho0)
+print('prefactor calculated')
+
 I0 = intensity(E_field(0,0))
 Icross = np.zeros((len(rho0),len(p_list)))
 
 for j, p in enumerate(p_list):
+    print(j)
     Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
     Icross[:,j] = intensity(Ecross)
     
