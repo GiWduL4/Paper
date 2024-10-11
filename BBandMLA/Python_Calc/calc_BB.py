@@ -139,12 +139,12 @@ x = np.linspace(-4,4,200)
 y = np.linspace(-4,4,200)
 xm, ym = np.meshgrid(x,y)
 
-p = 1.3
+p = 1.
 
 I0 = intensity(E_field(xm,ym))
 E = E_field(xm,ym) + E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
 Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 9)
+ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 18)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
