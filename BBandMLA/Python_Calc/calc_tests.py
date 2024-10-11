@@ -20,12 +20,12 @@ import graphical_analysis as ga
 
 E0 = 1       
 
-n = 300
-k_max = 150
+n = 200
+k_max = 60
 
 Z = 0
-p_list = np.linspace(0,6,200)
-rho0_list = np.linspace(0.6,5,n)
+p_list = np.linspace(0,4.5,200)
+rho0_list = np.linspace(0.8,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -56,8 +56,8 @@ for i in range(len(rho0_list)):
 Plot
 """
 
-ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
+# ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
+ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 0.5)
 
 Imin = np.min(Icross, axis = 0)
 rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
@@ -68,6 +68,7 @@ ax.set_xlabel(r'pitch to waist')
 ax.set_ylabel( r'optimal $\rho_0$')
 
 ax.plot(p_list, rho_opt, 'b+', label = r'cross')
+# ax.plot(p_list, Imin, 'r-', label = r'cross')
 # # ax.plot(p, I0*25, 'g-', label = r'single')
 # # ax.plot(rho0_list, N, 'r-.', label = r'Kummer imag')
 # plt.legend(loc = 'best', prop = {'size':15})
