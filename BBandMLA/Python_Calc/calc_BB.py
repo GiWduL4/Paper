@@ -22,7 +22,7 @@ import graphical_analysis as ga
 E0 = 1       
 
 n = 500
-k_max = 200
+k_max = 30
 
 Z = 0
 p_list = [1]#np.linspace(0,5.5,500)
@@ -49,9 +49,9 @@ def B0_pre(rho0):
     return B0_prefactor
 
 def B0_calc(r2):
-    B0 = Decimal(0)
+    B0 = 0
     for k in range(k_max):
-        B0 += B0pre[:,k]*Decimal((-r2)**k) 
+        B0 += B0pre[:,k]*(-r2)**k 
         # print(type(B0))
     B0 = 2 * B0
     return(B0)
@@ -135,8 +135,8 @@ print('prefactors calculated')
 """
 Plot
 """
-x = np.linspace(-5,5,400)
-y = np.linspace(-5,5,400)
+x = np.linspace(-3,3,400)
+y = np.linspace(-3,3,400)
 xm, ym = np.meshgrid(x,y)
 
 p = 1.3
@@ -144,7 +144,7 @@ p = 1.3
 I0 = intensity(E_field(xm,ym))
 E = E_field(xm,ym)#+ E_field(xm-p,ym) +E_field(xm+p,ym) 
 Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 4)
+ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 1)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
