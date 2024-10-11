@@ -24,8 +24,8 @@ n = 500
 k_max = 160
 
 Z = 0
-p_list = np.linspace(0,5.5,500)
-rho0 = np.linspace(0.5,5,n)
+p_list = np.linspace(0,5,500)
+rho0 = np.linspace(0.8,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -122,7 +122,7 @@ I0 = intensity(E_field(0,0))
 Icross = np.zeros((len(rho0),len(p_list)))
 step = 0
 for j, p in enumerate(p_list):
-    Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
+    Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p) + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
     Icross[:,j] = intensity(Ecross)
     progress = (j+1)/len(p_list)
     if progress >= step:
