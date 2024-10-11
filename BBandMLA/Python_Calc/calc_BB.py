@@ -20,37 +20,66 @@ import graphical_analysis as ga
 
 E0 = 1       
 
-n = 50
+n = 100
 k_max = 60
 
 Z = 0
-p_list = np.linspace(0,4.5,5)
+p_list = np.linspace(0,4.5,100)
 rho0 = np.linspace(0.8,5,n)
 """
 B0 and B2; case Z = 0
 """
 def B0_pre(rho0):
-    B0_prefactor = np.zeros(k_max)
-    x3 = -rho0**2
-    for k in range(k_max):
-        B0_prefactor[k] = ss.hyp1f1(k+1, 1/2, x3)/m.factorial(k)
-    return(B0_prefactor)
+    # Ensure rho0 is an array (even if it's a single scalar value)
+    rho0 = np.atleast_1d(rho0)
+    
+    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
+    B0_prefactor = np.zeros((len(rho0), k_max))
+    
+    for i, r in enumerate(rho0):
+        x3 = -r**2
+        for k in range(k_max):
+            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) / m.factorial(k)
+    
+    # If rho0 was a scalar, return a 1D array instead of 2D
+    if B0_prefactor.shape[0] == 1:
+        return B0_prefactor[0]
+    return B0_prefactor
 
 def B0_calc(r2, rh0):
     B0 = 0
     for k in range(k_max):
-        B0 += B0_pre(rho0)[k]*(-r2)**k 
+        B0 += B0_pre(rho0)[:,k]*(-r2)**k 
         # print(type(B0))
     B0 = 2 * B0
     return(B0)
 
-def B2_calc(r2, rho0):
+def B2_pre(rho0):
+    # Ensure rho0 is an array (even if it's a single scalar value)
+    rho0 = np.atleast_1d(rho0)
+    
+    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
+    B2_prefactor = np.zeros((len(rho0), k_max))
+    
+    for i, r in enumerate(rho0):
+        x3 = -r**2
+        for k in range(k_max):
+            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) / m.factorial(k)
+    
+    # If rho0 was a scalar, return a 1D array instead of 2D
+    if B2_prefactor.shape[0] == 1:
+        return B2_prefactor[0]
+    return B2_prefactor
+
+def B2_calc(r2, rh0):
     B2 = 0
-    x3 = -rho0**2
     for k in range(k_max):
-        B2 += ss.hyp1f1(k+2, 3/2, x3)*(-r2)**k/m.factorial(k)
-    B2 = 4 * rho0 * B2
+        B2 += B2_pre(rho0)[:,k]*(-r2)**k 
+        # print(type(B0))
+    B2 = 2 * B2
     return(B2)
+
+
 
 def E_field(x,y):
     E = [0,0]
@@ -61,8 +90,8 @@ def E_field(x,y):
     E[1] = B2*y + 1j* B0 -1j*B2*x
     return(E)
 
-def intensity(x,y):
-    return(np.abs(E_field(x,y)[0])**2 + np.abs(E_field(x,y)[1])**2)
+def intensity(Efield):
+    return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
 # first value for central and second for nearest neighbors
 
 # B2 = [0,0]
@@ -85,14 +114,20 @@ def intensity(x,y):
 # I0 = B00**2
 # Icross = (B00+4*B01)**2
 
-I0 = intensity(0,0)
+I0 = intensity(E_field(0,0))
+Icross = np.zeros((len(rho0),len(p_list)))
+
+for j, p in enumerate(p_list):
+    Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
+    Icross[:,j] = intensity(Ecross)
+    
 
 """
 Plot
 """
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-# ga.reel_2D(p_list, rho0, I0, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 0.5)
+ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 0.5)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
