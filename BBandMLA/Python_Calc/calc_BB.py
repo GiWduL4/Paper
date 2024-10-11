@@ -10,6 +10,7 @@ import scipy.integrate as integrate
 import math as m
 import matplotlib.pyplot as plt
 import scipy.special as ss
+from decimal import Decimal
 
 # Defining pathes for importing own modules
 import sys
@@ -21,11 +22,11 @@ import graphical_analysis as ga
 E0 = 1       
 
 n = 500
-k_max = 160
+k_max = 200
 
 Z = 0
-p_list = np.linspace(0,5.5,500)
-rho0 = np.linspace(0.5,5,n)
+p_list = [1]#np.linspace(0,5.5,500)
+rho0 = [1.5]#np.linspace(0.5,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -38,18 +39,19 @@ def B0_pre(rho0):
     
     for i, r in enumerate(rho0):
         x3 = -r**2
+        print(x3)
         for k in range(k_max):
-            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) / m.factorial(k)
+            B0_prefactor[i, k] = Decimal(ss.hyp1f1(k+1, 1/2, x3)) / Decimal(m.factorial(k))
     
     # If rho0 was a scalar, return a 1D array instead of 2D
-    if B0_prefactor.shape[0] == 1:
-        return B0_prefactor[0]
+    # if B0_prefactor.shape[0] == 1:
+    #     return B0_prefactor[0]
     return B0_prefactor
 
 def B0_calc(r2):
-    B0 = 0
+    B0 = Decimal(0)
     for k in range(k_max):
-        B0 += B0pre[:,k]*(-r2)**k 
+        B0 += B0pre[:,k]*Decimal((-r2)**k) 
         # print(type(B0))
     B0 = 2 * B0
     return(B0)
@@ -64,11 +66,11 @@ def B2_pre(rho0):
     for i, r in enumerate(rho0):
         x3 = -r**2
         for k in range(k_max):
-            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) / m.factorial(k)
+            B2_prefactor[i, k] = Decimal(ss.hyp1f1(k+2, 3/2, x3)) / Decimal(m.factorial(k))
     
     # If rho0 was a scalar, return a 1D array instead of 2D
-    if B2_prefactor.shape[0] == 1:
-        return B2_prefactor[0]
+    # if B2_prefactor.shape[0] == 1:
+    #     return B2_prefactor[0]
     return B2_prefactor
 
 def B2_calc(r2):
@@ -118,24 +120,34 @@ B0pre = B0_pre(rho0)
 B2pre = B2_pre(rho0)
 print('prefactors calculated')
 
-I0 = intensity(E_field(0,0))
-Icross = np.zeros((len(rho0),len(p_list)))
-step = 0
-for j, p in enumerate(p_list):
-    Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
-    Icross[:,j] = intensity(Ecross)
-    progress = (j+1)/len(p_list)
-    if progress >= step:
-        print('Progress: ' + str(round(progress*100,3)) + ' %')
-        step += 0.1
+# I0 = intensity(E_field(0,0))
+# Icross = np.zeros((len(rho0),len(p_list)))
+# step = 0
+# for j, p in enumerate(p_list):
+#     Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
+#     Icross[:,j] = intensity(Ecross)
+#     progress = (j+1)/len(p_list)
+#     if progress >= step:
+#         print('Progress: ' + str(round(progress*100,3)) + ' %')
+#         step += 0.1
     
 
 """
 Plot
 """
+x = np.linspace(-5,5,400)
+y = np.linspace(-5,5,400)
+xm, ym = np.meshgrid(x,y)
+
+p = 1.3
+
+I0 = intensity(E_field(xm,ym))
+E = E_field(xm,ym)#+ E_field(xm-p,ym) +E_field(xm+p,ym) 
+Icross = intensity(E)
+ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 4)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
+# ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
