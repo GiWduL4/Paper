@@ -68,13 +68,36 @@ def E_field(params):
     E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
     return np.array(E)
 
-def intensity(Efield):
-    return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
+def intensity(E_real, E_imag):
+    return(np.abs(E_real)**2 + np.abs(E_imag)**2)
     
 def E_field_setup(params):
     x, y, rho0 = params
     E = E_field((x,y,rho0)) #+ E_field((x+p,y,rho0)) + E_field((x-p,y,rho0))
     return E
+
+# Vectorized version of electric field calculation for arrays of (x, y)
+def E_field_vectorized(X, Y, rho0):
+    r2 = X**2 + Y**2  # This is now vectorized, applied to arrays
+
+    B0_vals = np.zeros(X.shape, dtype=complex)
+    B2_vals = np.zeros(X.shape, dtype=complex)
+    step = 0
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            # Calculate B0 and B2 using mpmath for each (x, y)
+            r2_ij = mpf(r2[i, j])
+            B0_vals[i, j] = B0_series(rho0, r2_ij)
+            B2_vals[i, j] = B2_series(rho0, r2_ij)
+        progress = (i+1)/X.shape[0]
+        if progress >= step:
+            print('Progress: ' + str(round(progress*100,3)) + ' %')
+            step += 0.1
+    # Now calculate E[0] and E[1] based on B0 and B2
+    E_real = B0_vals + B2_vals * X + 1j * B2_vals * Y
+    E_imag = B2_vals * Y + 1j * B0_vals - 1j * B2_vals * X
+
+    return E_real, E_imag
 
 # Helper function for parallelization
 def compute_intensity(params):
@@ -85,13 +108,22 @@ def compute_intensity(params):
 Optimized Grid Calculation
 """
 # Parameters
-rho0 = mp(1.5)
-p = mp(1.3)  # Using mpmath's arbitrary precision float
-nx, ny = 20, 20
+rho0 = mpf(1.5)
+p = mpf(1.3)  # Using mpmath's arbitrary precision float
+nx, ny = 80, 80
 
 # Generate grid
 X = np.linspace(-3, 3, nx)
 Y = np.linspace(-3, 3, ny)
+
+
+# # Create meshgrid for X and Y
+# Xm, Ym = np.meshgrid(X, Y)
+
+# # Calculate electric field using the vectorized approach
+# E_r, E_i = E_field_vectorized(Xm, Ym, rho0)
+
+# I = intensity(E_r, E_i)
 
 # Create intensity map
 I = np.zeros((nx, ny))
@@ -99,7 +131,7 @@ step = 0
 for i, x in enumerate(X):
     for j, y in enumerate(Y):
         E = E_field((x, y, rho0))
-        I[i, j] = intensity(E)
+        I[i, j] = intensity(E[0], E[1])
     progress = (i+1)/nx
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
