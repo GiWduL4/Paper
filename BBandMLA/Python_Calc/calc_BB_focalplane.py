@@ -12,7 +12,6 @@ import matplotlib.pyplot as plt
 import scipy.special as ss
 from decimal import Decimal
 from mpmath import nsum, inf, fac, hyp1f1, mp, mpf
-from multiprocessing import Pool
 
 
 # Defining pathes for importing own modules
@@ -108,34 +107,33 @@ def compute_intensity(params):
 Optimized Grid Calculation
 """
 # Parameters
-rho0 = mpf(1.5)
-p = mpf(1.3)  # Using mpmath's arbitrary precision float
-nx, ny = 80, 80
+rho0 = 1.5
+p = 1.3  # Using mpmath's arbitrary precision float
+nx, ny = 50, 50
 
 # Generate grid
-X = np.linspace(-3, 3, nx)
-Y = np.linspace(-3, 3, ny)
+X = np.linspace(-2, 2, nx)
+Y = np.linspace(-2, 2, ny)
 
+# Create meshgrid for X and Y
+Xm, Ym = np.meshgrid(X, Y)
 
-# # Create meshgrid for X and Y
-# Xm, Ym = np.meshgrid(X, Y)
+# Calculate electric field using the vectorized approach
+E_r, E_i = E_field_vectorized(Xm, Ym, rho0)
 
-# # Calculate electric field using the vectorized approach
-# E_r, E_i = E_field_vectorized(Xm, Ym, rho0)
-
-# I = intensity(E_r, E_i)
+I = intensity(E_r, E_i)
 
 # Create intensity map
-I = np.zeros((nx, ny))
-step = 0
-for i, x in enumerate(X):
-    for j, y in enumerate(Y):
-        E = E_field((x, y, rho0))
-        I[i, j] = intensity(E[0], E[1])
-    progress = (i+1)/nx
-    if progress >= step:
-        print('Progress: ' + str(round(progress*100,3)) + ' %')
-        step += 0.1
+# I = np.zeros((nx, ny))
+# step = 0
+# for i, x in enumerate(X):
+#     for j, y in enumerate(Y):
+#         E = E_field((x, y, rho0))
+#         I[i, j] = intensity(E[0], E[1])
+#     progress = (i+1)/nx
+#     if progress >= step:
+#         print('Progress: ' + str(round(progress*100,3)) + ' %')
+#         step += 0.1
 
 
 # Create a list of all grid points as input for parallel computation
