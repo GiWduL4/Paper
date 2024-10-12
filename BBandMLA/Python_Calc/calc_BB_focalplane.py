@@ -11,7 +11,8 @@ import math as m
 import matplotlib.pyplot as plt
 import scipy.special as ss
 from decimal import Decimal
-from mpmath import nsum, inf, fac
+from mpmath import nsum, inf, fac, hyp1f1, mp, mpf
+from multiprocessing import Pool
 
 
 # Defining pathes for importing own modules
@@ -27,126 +28,85 @@ n = 500
 k_max = 120
 
 Z = 0
-p_list = [1]#np.linspace(0,5.5,500)
-rho0 = [1.5]#np.linspace(0.5,5,n)
+# p_list = [1]#np.linspace(0,5.5,500)
+# rho0 = [1.5]#np.linspace(0.5,5,n)
 """
 B0 and B2; case Z = 0
 """
-def B0_pre(rho0):
-    # Ensure rho0 is an array (even if it's a single scalar value)
-    rho0 = np.atleast_1d(rho0)
-    
-    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
-    B0_prefactor = np.zeros((len(rho0), k_max))
-    
-    for i, r in enumerate(rho0):
-        x3 = -r**2
-        print(x3)
-        for k in range(k_max):
-            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) /fac(k)
-    
-    # If rho0 was a scalar, return a 1D array instead of 2D
-    # if B0_prefactor.shape[0] == 1:
-    #     return B0_prefactor[0]
-    return B0_prefactor
+# def B0_series(k):
+#     return hyp1f1(k+1, 1/2, x3) /fac(k) * (-r2)**k
 
-def B0_calc(r2):
-    B0 = 0
-    for k in range(k_max):
-        B0 += B0pre[:,k]*(-r2)**k 
-        # print(type(B0))
-    B0 = 2 * B0
-    return(B0)
-
-def B2_pre(rho0):
-    # Ensure rho0 is an array (even if it's a single scalar value)
-    rho0 = np.atleast_1d(rho0)
-    
-    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
-    B2_prefactor = np.zeros((len(rho0), k_max))
-    
-    for i, r in enumerate(rho0):
-        x3 = -r**2
-        for k in range(k_max):
-            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) /fac(k)
-    
-    # If rho0 was a scalar, return a 1D array instead of 2D
-    # if B2_prefactor.shape[0] == 1:
-    #     return B2_prefactor[0]
-    return B2_prefactor
-
-def B2_calc(r2):
-    B2 = 0
-    for k in range(k_max):
-        B2 += B2pre[:,k]*(-r2)**k 
-        # print(type(B0))
-    B2 = 4 * rho0[0] * B2
-    return(B2)
+# sum_result = nsum(alternating_series, [0, inf])
+# print(sum_result)
 
 
+# Define the series term with additional arguments a, b, z
+def B0_term(k, x3, r2):
+    return hyp1f1(k+1, 1/2, x3) /fac(k) * (-r2)**k
 
-def E_field(x,y):
-    E = [0,0]
-    r2 = x**2 + y**2
-    B0 = B0_calc(r2)
-    B2 = B2_calc(r2)
-    E[0] = B0 + B2*x + 1j*B2*y
-    E[1] = B2*y + 1j* B0 -1j*B2*x
-    return(np.array(E))
+# Now, use mpmath's nsum to sum the series with additional parameters
+def B0_series(rho0, r2):
+    # Use nsum to sum from k = 0 to infinity
+    return 2 * nsum(lambda k: B0_term(k, -rho0**2, r2), [0, inf])
+
+
+# Define the series term with additional arguments a, b, z
+def B2_term(k, x3, r2):
+    return hyp1f1(k+2, 3/2, x3) /fac(k) * (-r2)**k
+
+# Now, use mpmath's nsum to sum the series with additional parameters
+def B2_series(rho0, r2):
+    # Use nsum to sum from k = 0 to infinity
+    return 4 * rho0 * nsum(lambda k: B2_term(k, -rho0**2, r2), [0, inf])
+
+
+def E_field(params):
+    x, y, rho0 = params
+    r2 = mpf(x)**2 + mpf(y)**2
+    B0 = B0_series(rho0, r2)
+    B2 = B2_series(rho0, r2)
+    E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
+    return E
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
-# first value for central and second for nearest neighbors
-
-# B2 = [0,0]
-# I0 = np.zeros((len(rho0_list),len(p_list)))
-# Icross = np.zeros((len(rho0_list),len(p_list)))
-
-# for i in range(len(rho0_list)):
-#     rho0 = rho0_list[i]
-#     x3 = -rho0**2               
-#     B00 = 2*ss.hyp1f1(1, 1/2, x3)
-#     for j in range(len(p_list)):
-#         p = p_list[j]
-#         B01 = 0
-#         for k in range(k_max):
-#             B01 += 2*ss.hyp1f1(k+1, 1/2, x3)*(-p**2)**k/m.factorial(k)
-#         I0[i,j] = B00**2
-#         Icross[i,j] = (B00+4*B01)**2
-    # B2[1] += 4*rho0*ss.hyp1f1(k+2, 3/2, x3)*(-p**2)**k/m.factorial(k)
-
-# I0 = B00**2
-# Icross = (B00+4*B01)**2
-
-B0pre = B0_pre(rho0)
-B2pre = B2_pre(rho0)
-print('prefactors calculated')
-
-# I0 = intensity(E_field(0,0))
-# Icross = np.zeros((len(rho0),len(p_list)))
-# step = 0
-# for j, p in enumerate(p_list):
-#     Ecross = E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p)
-#     Icross[:,j] = intensity(Ecross)
-#     progress = (j+1)/len(p_list)
-#     if progress >= step:
-#         print('Progress: ' + str(round(progress*100,3)) + ' %')
-#         step += 0.1
     
 
-"""
-Plot
-"""
-x = np.linspace(-4,4,200)
-y = np.linspace(-4,4,200)
-xm, ym = np.meshgrid(x,y)
 
-p = 1.
+# Helper function for parallelization
+def compute_intensity(params):
+    E = E_field(params)
+    return intensity(E)
 
-I0 = intensity(E_field(xm,ym))
-E = E_field(xm,ym) + E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
-Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 18)
+"""
+Optimized Grid Calculation
+"""
+# Parameters
+rho0 = mpf(0.924)  # Using mpmath's arbitrary precision float
+nx, ny = 10, 10
+
+# Generate grid
+X = np.linspace(-4, 4, nx)
+Y = np.linspace(-4, 4, ny)
+
+# Create intensity map
+I = np.zeros((nx, ny))
+for i, x in enumerate(X):
+    for j, y in enumerate(Y):
+        E = E_field((x, y, rho0))
+        I[i, j] = intensity(E)
+
+# Create a list of all grid points as input for parallel computation
+# grid_points = [(mpf(x), mpf(y), rho0) for x in X for y in Y]
+
+# # Use multiprocessing to compute intensities in parallel
+# with Pool() as pool:
+#     I_flat = pool.map(compute_intensity, grid_points)
+
+# # Reshape the flat list back to a 2D grid
+# I = np.reshape(I_flat, (nx, ny))
+
+# ga.reel_2D(X, Y, I, xlabel='x', ylabel=r'y', vmax = 1)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
