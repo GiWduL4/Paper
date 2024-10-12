@@ -62,7 +62,7 @@ def B2_series(rho0, r2):
 
 def E_field(params):
     x, y, rho0 = params
-    r2 = mpf(x)**2 + mpf(y)**2
+    r2 = x**2 + y**2
     B0 = B0_series(rho0, r2)
     B2 = B2_series(rho0, r2)
     E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
@@ -73,7 +73,7 @@ def intensity(Efield):
     
 def E_field_setup(params):
     x, y, rho0 = params
-    E = E_field((x,y,rho0)) + E_field((x+p,y,rho0)) + E_field((x-p,y,rho0))
+    E = E_field((x,y,rho0)) #+ E_field((x+p,y,rho0)) + E_field((x-p,y,rho0))
     return E
 
 # Helper function for parallelization
@@ -85,8 +85,8 @@ def compute_intensity(params):
 Optimized Grid Calculation
 """
 # Parameters
-rho0 = mpf(1.5)
-p = mpf(1.3)  # Using mpmath's arbitrary precision float
+rho0 = mp(1.5)
+p = mp(1.3)  # Using mpmath's arbitrary precision float
 nx, ny = 20, 20
 
 # Generate grid
@@ -98,7 +98,7 @@ I = np.zeros((nx, ny))
 step = 0
 for i, x in enumerate(X):
     for j, y in enumerate(Y):
-        E = E_field_setup((x, y, rho0))
+        E = E_field((x, y, rho0))
         I[i, j] = intensity(E)
     progress = (i+1)/nx
     if progress >= step:
