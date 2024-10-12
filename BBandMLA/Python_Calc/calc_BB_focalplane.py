@@ -22,11 +22,11 @@ import graphical_analysis as ga
 E0 = 1       
 
 n = 500
-k_max = 120
+k_max = 100
 
 Z = 0
 p_list = [1]#np.linspace(0,5.5,500)
-rho0 = [1.5]#np.linspace(0.5,5,n)
+rho0 = [0.924]#np.linspace(0.5,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -41,7 +41,7 @@ def B0_pre(rho0):
         x3 = -r**2
         print(x3)
         for k in range(k_max):
-            B0_prefactor[i, k] = Decimal(ss.hyp1f1(k+1, 1/2, x3)) / Decimal(m.factorial(k))
+            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) / ss.factorial(k)
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B0_prefactor.shape[0] == 1:
@@ -66,7 +66,7 @@ def B2_pre(rho0):
     for i, r in enumerate(rho0):
         x3 = -r**2
         for k in range(k_max):
-            B2_prefactor[i, k] = Decimal(ss.hyp1f1(k+2, 3/2, x3)) / Decimal(m.factorial(k))
+            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) / ss.factorial(k)
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B2_prefactor.shape[0] == 1:
@@ -135,16 +135,16 @@ print('prefactors calculated')
 """
 Plot
 """
-x = np.linspace(-4,4,200)
-y = np.linspace(-4,4,200)
+x = np.linspace(-7.5,7.5,500)
+y = np.linspace(-7.5,7.5,500)
 xm, ym = np.meshgrid(x,y)
 
-p = 1.
+p = 4.
 
 I0 = intensity(E_field(xm,ym))
-E = E_field(xm,ym) + E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+E = E_field(xm,ym) #+ E_field(xm-p,ym) #+E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
 Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 18)
+ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 2)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
