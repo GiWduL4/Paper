@@ -66,12 +66,15 @@ def E_field(params):
     B0 = B0_series(rho0, r2)
     B2 = B2_series(rho0, r2)
     E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
-    return E
+    return np.array(E)
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
     
-
+def E_field_setup(params):
+    x, y, rho0 = params
+    E = E_field((x,y,rho0)) + E_field((x+p,y,rho0)) + E_field((x-p,y,rho0))
+    return E
 
 # Helper function for parallelization
 def compute_intensity(params):
@@ -82,19 +85,26 @@ def compute_intensity(params):
 Optimized Grid Calculation
 """
 # Parameters
-rho0 = mpf(0.924)  # Using mpmath's arbitrary precision float
-nx, ny = 10, 10
+rho0 = mpf(1.5)
+p = mpf(1.3)  # Using mpmath's arbitrary precision float
+nx, ny = 20, 20
 
 # Generate grid
-X = np.linspace(-4, 4, nx)
-Y = np.linspace(-4, 4, ny)
+X = np.linspace(-3, 3, nx)
+Y = np.linspace(-3, 3, ny)
 
 # Create intensity map
 I = np.zeros((nx, ny))
+step = 0
 for i, x in enumerate(X):
     for j, y in enumerate(Y):
-        E = E_field((x, y, rho0))
+        E = E_field_setup((x, y, rho0))
         I[i, j] = intensity(E)
+    progress = (i+1)/nx
+    if progress >= step:
+        print('Progress: ' + str(round(progress*100,3)) + ' %')
+        step += 0.1
+
 
 # Create a list of all grid points as input for parallel computation
 # grid_points = [(mpf(x), mpf(y), rho0) for x in X for y in Y]
@@ -106,7 +116,7 @@ for i, x in enumerate(X):
 # # Reshape the flat list back to a 2D grid
 # I = np.reshape(I_flat, (nx, ny))
 
-# ga.reel_2D(X, Y, I, xlabel='x', ylabel=r'y', vmax = 1)
+ga.reel_2D(X, Y, I, xlabel='x', ylabel=r'y', vmax = 1)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
