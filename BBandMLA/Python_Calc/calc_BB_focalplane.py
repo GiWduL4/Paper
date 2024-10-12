@@ -21,12 +21,12 @@ import graphical_analysis as ga
 
 E0 = 1       
 
-n = 500
-k_max = 100
+n = 5
+k_max = 101
 
 Z = 0
 p_list = [1]#np.linspace(0,5.5,500)
-rho0 = [0.924]#np.linspace(0.5,5,n)
+rho0 = np.linspace(0.5,5,n)
 """
 B0 and B2; case Z = 0
 """
@@ -135,14 +135,18 @@ print('prefactors calculated')
 """
 Plot
 """
-x = np.linspace(-7.5,7.5,500)
-y = np.linspace(-7.5,7.5,500)
+x = np.linspace(-5,5,801)
+y = np.linspace(-5,5,801)
 xm, ym = np.meshgrid(x,y)
 
 p = 4.
 
 I0 = intensity(E_field(xm,ym))
 E = E_field(xm,ym) #+ E_field(xm-p,ym) #+E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+r2 = xm**2 + ym**2
+A = np.where(r2>=4.666**2) #computable with numpy
+E[0][A] = 0
+E[1][A] = 0
 Icross = intensity(E)
 ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 2)
 
