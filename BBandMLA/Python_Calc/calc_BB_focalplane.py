@@ -21,12 +21,12 @@ import graphical_analysis as ga
 
 E0 = 1       
 
-n = 5
+n = 50
 k_max = 101
 
 Z = 0
 p_list = [1]#np.linspace(0,5.5,500)
-rho0 = np.linspace(0.5,5,n)
+rho0_list = np.linspace(0.5,3,n)
 """
 B0 and B2; case Z = 0
 """
@@ -39,7 +39,6 @@ def B0_pre(rho0):
     
     for i, r in enumerate(rho0):
         x3 = -r**2
-        print(x3)
         for k in range(k_max):
             B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3) / ss.factorial(k)
     
@@ -78,7 +77,7 @@ def B2_calc(r2):
     for k in range(k_max):
         B2 += B2pre[:,k]*(-r2)**k 
         # print(type(B0))
-    B2 = 4 * rho0[0] * B2
+    B2 = 4 * rho0 * B2
     return(B2)
 
 
@@ -116,9 +115,9 @@ def intensity(Efield):
 # I0 = B00**2
 # Icross = (B00+4*B01)**2
 
-B0pre = B0_pre(rho0)
-B2pre = B2_pre(rho0)
-print('prefactors calculated')
+# B0pre = B0_pre(rho0)
+# B2pre = B2_pre(rho0)
+# print('prefactors calculated')
 
 # I0 = intensity(E_field(0,0))
 # Icross = np.zeros((len(rho0),len(p_list)))
@@ -135,20 +134,22 @@ print('prefactors calculated')
 """
 Plot
 """
-x = np.linspace(-5,5,801)
-y = np.linspace(-5,5,801)
+x = np.linspace(-5,5,401)
+y = np.linspace(-5,5,401)
 xm, ym = np.meshgrid(x,y)
 
-p = 4.
-
-I0 = intensity(E_field(xm,ym))
-E = E_field(xm,ym) #+ E_field(xm-p,ym) #+E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
-r2 = xm**2 + ym**2
-A = np.where(r2>=4.666**2) #computable with numpy
-E[0][A] = 0
-E[1][A] = 0
-Icross = intensity(E)
-ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 2)
+for rho0 in rho0_list:
+    B0pre = B0_pre(rho0)
+    B2pre = B2_pre(rho0)
+    print('prefactors calculated')
+    # I0 = intensity(E_field(xm,ym))
+    E = E_field(xm,ym) #+ E_field(xm-p,ym) #+E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+    r2 = xm**2 + ym**2
+    A = np.where(r2>=4.666**2) #computable with numpy
+    E[0][A] = 0
+    E[1][A] = 0
+    Icross = intensity(E)
+    ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 2)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
