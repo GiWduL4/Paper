@@ -11,6 +11,7 @@ import math as m
 import matplotlib.pyplot as plt
 import scipy.special as ss
 from decimal import Decimal
+from mpmath import nsum, inf, fac, hyp1f1, mpf
 
 # Defining pathes for importing own modules
 import sys
@@ -32,70 +33,39 @@ rho0 = np.linspace(0.8,5,n)
 """
 B0 and B2; case Z = 0
 """
-def B0_pre(rho0):
-    # Ensure rho0 is an array (even if it's a single scalar value)
-    rho0 = np.atleast_1d(rho0)
-    
-    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
-    B0_prefactor = np.zeros((len(rho0), k_max))
-    
-    for i, r in enumerate(rho0):
-        x3 = -r**2
-        # print(x3)
-        for k in range(k_max):
-            B0_prefactor[i, k] = Decimal(ss.hyp1f1(k+1, 1/2, x3)) / Decimal(m.factorial(k))
-    
-    # If rho0 was a scalar, return a 1D array instead of 2D
-    # if B0_prefactor.shape[0] == 1:
-    #     return B0_prefactor[0]
-    return B0_prefactor
+# Define the series term with additional arguments a, b, z
+def B0_term(k, x3, r2):
+    return hyp1f1(k+1, 1/2, x3) /fac(k) * (-r2)**k
 
-def B0_calc(r2):
-    B0 = 0
-    for k in range(k_max):
-        B0 += B0pre[:,k]*(-r2)**k 
-        # print(type(B0))
-    B0 = 2 * B0
-    return(B0)
-
-def B2_pre(rho0):
-    # Ensure rho0 is an array (even if it's a single scalar value)
-    rho0 = np.atleast_1d(rho0)
-    
-    # Initialize the output as a 2D array (for each rho0, you get an array of size k_max)
-    B2_prefactor = np.zeros((len(rho0), k_max))
-    
-    for i, r in enumerate(rho0):
-        x3 = -r**2
-        for k in range(k_max):
-            B2_prefactor[i, k] = Decimal(ss.hyp1f1(k+2, 3/2, x3)) / Decimal(m.factorial(k))
-    
-    # If rho0 was a scalar, return a 1D array instead of 2D
-    # if B2_prefactor.shape[0] == 1:
-    #     return B2_prefactor[0]
-    return B2_prefactor
-
-def B2_calc(r2):
-    B2 = 0
-    for k in range(k_max):
-        B2 += B2pre[:,k]*(-r2)**k 
-        # print(type(B0))
-    B2 = 4 * rho0[0] * B2
-    return(B2)
+# Now, use mpmath's nsum to sum the series with additional parameters
+def B0_series(rho0, r2):
+    # Use nsum to sum from k = 0 to infinity
+    return 2 * nsum(lambda k: B0_term(k, -rho0**2, r2), [0, inf])
 
 
+# Define the series term with additional arguments a, b, z
+def B2_term(k, x3, r2):
+    return hyp1f1(k+2, 3/2, x3) /fac(k) * (-r2)**k
 
-def E_field(x,y):
-    E = [0,0]
-    r2 = x**2 + y**2
-    B0 = B0_calc(r2)
-    B2 = B2_calc(r2)
-    E[0] = B0 + B2*x + 1j*B2*y
-    E[1] = B2*y + 1j* B0 -1j*B2*x
-    return(np.array(E))
+# Now, use mpmath's nsum to sum the series with additional parameters
+def B2_series(rho0, r2):
+    # Use nsum to sum from k = 0 to infinity
+    return 4 * rho0 * nsum(lambda k: B2_term(k, -rho0**2, r2), [0, inf])
+
+
+def E_field(params):
+    x, y, rho0 = params
+    r2 = mpf(x)**2 + mpf(y)**2
+    B0 = B0_series(rho0, r2)
+    B2 = B2_series(rho0, r2)
+    E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
+    return np.array(E)
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
+
+
+
 # first value for central and second for nearest neighbors
 
 # B2 = [0,0]
