@@ -50,8 +50,8 @@ def E_field(params):
     r2 = mpf(x)**2 + mpf(y)**2
     B0 = B0_series(rho0, r2)
     B2 = B2_series(rho0, r2)
-    E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
-    return np.array(E)
+    E = np.array([B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x])*1/np.sqrt(2)
+    return E
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)

@@ -50,7 +50,15 @@ def E_field(params):
     r2 = mpf(x)**2 + mpf(y)**2
     B0 = B0_series(rho0, r2)
     B2 = B2_series(rho0, r2)
-    E = [B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x]
+    E = np.array([B0 + B2 * x + 1j * B2 * y, B2 * y + 1j * B0 - 1j * B2 * x])*1/np.sqrt(2)
+    return E
+
+def E_field_sym(params):
+    r, rho0 = params
+    r2 = r**2
+    B0 = B0_series(rho0, r2)*1/np.sqrt(2)
+    # B2 = B2_series(rho0, r2)*1/np.sqrt(2)
+    E = [B0, B0]
     return np.array(E)
 
 def intensity(Efield):
@@ -98,7 +106,7 @@ step = 0
 
 for i,rho0 in enumerate(rho0_list):    
     for j, p in enumerate(p_list):
-        Ecross = E_field((0,0,rho0)) + E_field((p,0,rho0)) + E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
+        Ecross = E_field((0,rho0)) + 4* E_field((p,rho0)) #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
 #     + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
 #     + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
