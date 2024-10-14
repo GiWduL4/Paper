@@ -54,8 +54,8 @@ def E_field(params):
     return E
 
 def E_field_sym(params):
-    r, rho0 = params
-    r2 = r**2
+    r2, rho0 = params
+    # r2 = r**2
     B0 = B0_series(rho0, r2)*1/np.sqrt(2)
     # B2 = B2_series(rho0, r2)*1/np.sqrt(2)
     E = [B0, 1j*B0]
@@ -97,8 +97,8 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 300
-l = 300
+n = 50
+l = 50
 
 Z = 0
 
@@ -106,24 +106,30 @@ p_list = np.linspace(0,10,l)
 rho0_list = np.linspace(0.5,5,n)
 
 # I0 = intensity(E_field((0,0,rho0)))
-I = np.zeros((len(rho0_list),len(p_list)))
+# I = np.zeros((len(rho0_list),len(p_list)))
+E = np.zeros((2,len(rho0_list),len(p_list))) #simplified E-field amplitude
+
 step = 0
-
-
 
 for i,rho0 in enumerate(rho0_list):    
     for j, p in enumerate(p_list):
-        E = E_field_sym_simplified((0,rho0)) + 4* E_field_sym_simplified((p,rho0)) #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
+        E[0,i,j] = E_field_sym_simplified((0,rho0)) 
+        E[1,i,j] =  E_field_sym_simplified((p,rho0)) 
+        E[2,i,j] =  E_field_sym_simplified((np.sqrt(2)*p,rho0))
+        
+        #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
 #     + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
 #     + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
 #     + E_field(p,2*p) + E_field(-p,-2*p) + E_field(-p,2*p) + E_field(p,-2*p))
-        I[i,j] = np.abs(E)**2#intensity(Ecross)
+        # E_help = E[0,i,j] + 4* E[1,i,j]
+        # I[i,j] = np.abs(E_help)**2#intensity(Ecross)
     progress = (i+1)/len(rho0_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
-    
+
+I = (E[0]+4*E[1])**2    
 
 """
 Plot
