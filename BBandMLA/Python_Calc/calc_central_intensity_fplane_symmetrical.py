@@ -103,19 +103,27 @@ l = 50
 Z = 0
 
 p_list = np.linspace(0,10,l)
+p2_list = p_list**2
 rho0_list = np.linspace(0.5,5,n)
 
 # I0 = intensity(E_field((0,0,rho0)))
 # I = np.zeros((len(rho0_list),len(p_list)))
-E = np.zeros((2,len(rho0_list),len(p_list))) #simplified E-field amplitude
+E = np.zeros((10,len(rho0_list),len(p2_list))) #simplified E-field amplitude
 
 step = 0
 
 for i,rho0 in enumerate(rho0_list):    
-    for j, p in enumerate(p_list):
+    for j, p2 in enumerate(p2_list):
         E[0,i,j] = E_field_sym_simplified((0,rho0)) 
-        E[1,i,j] =  E_field_sym_simplified((p,rho0)) 
-        E[2,i,j] =  E_field_sym_simplified((np.sqrt(2)*p,rho0))
+        E[1,i,j] =  E_field_sym_simplified((p2,rho0)) 
+        E[2,i,j] =  E_field_sym_simplified((2*p2,rho0))
+        E[3,i,j] =  E_field_sym_simplified((4*p2,rho0))
+        E[4,i,j] =  E_field_sym_simplified((5*p2,rho0))
+        E[5,i,j] =  E_field_sym_simplified((8*p2,rho0))
+        E[6,i,j] =  E_field_sym_simplified((9*p2,rho0))
+        E[7,i,j] =  E_field_sym_simplified((10*p2,rho0))
+        E[8,i,j] =  E_field_sym_simplified((13*p2,rho0))
+        E[9,i,j] =  E_field_sym_simplified((18*p2,rho0))
         
         #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
