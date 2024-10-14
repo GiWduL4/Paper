@@ -20,15 +20,7 @@ sys.path.insert(1, "C:/Users/Ludwig/OneDrive/Dokumente/GitKraken/ATOMICS-python-
 
 import graphical_analysis as ga
 
-E0 = 1       
 
-n = 500
-k_max = 100
-
-Z = 0
-
-p_list = np.linspace(0,5,500)
-rho0 = np.linspace(0.8,5,n)
 
 """
 B0 and B2; case Z = 0
@@ -88,21 +80,31 @@ def intensity(Efield):
 # I0 = B00**2
 # Icross = (B00+4*B01)**2
 
-B0pre = B0_pre(rho0)
-B2pre = B2_pre(rho0)
-print('prefactors calculated')
+E0 = 1       
 
-I0 = intensity(E_field(0,0))
-Icross = np.zeros((len(rho0),len(p_list)))
+n = 100
+k_max = 100
+
+Z = 0
+
+p_list = np.linspace(0,5,100)
+rho0_list = np.linspace(0.8,5,n)
+
+# I0 = intensity(E_field((0,0,rho0)))
+Icross = np.zeros((len(rho0_list),len(p_list)))
 step = 0
-for j, p in enumerate(p_list):
-    Ecross =( E_field(0,0) + E_field(p,0) + E_field(-p,0) + E_field(0,p) + E_field(0,-p) 
-    + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
-    + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
-    + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
-    + E_field(p,2*p) + E_field(-p,-2*p) + E_field(-p,2*p) + E_field(p,-2*p))
-    Icross[:,j] = intensity(Ecross)
-    progress = (j+1)/len(p_list)
+
+
+
+for i,rho0 in enumerate(rho0_list):    
+    for j, p in enumerate(p_list):
+        Ecross = E_field((0,0,rho0)) + E_field((p,0,rho0)) + E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
+#     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
+#     + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
+#     + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
+#     + E_field(p,2*p) + E_field(-p,-2*p) + E_field(-p,2*p) + E_field(p,-2*p))
+        Icross[i,j] = intensity(Ecross)
+    progress = (i+1)/len(rho0_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
@@ -113,7 +115,7 @@ Plot
 """
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
+ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 1)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
