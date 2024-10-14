@@ -97,13 +97,13 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 50
-l = 50
+n = 300
+l = 300
 
 Z = 0
 
-p_list = np.linspace(0,8,l)
-rho0_list = np.linspace(0.8,5,n)
+p_list = np.linspace(0,10,l)
+rho0_list = np.linspace(0.5,5,n)
 
 # I0 = intensity(E_field((0,0,rho0)))
 I = np.zeros((len(rho0_list),len(p_list)))
