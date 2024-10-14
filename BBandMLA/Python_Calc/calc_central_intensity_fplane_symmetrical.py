@@ -58,12 +58,19 @@ def E_field_sym(params):
     r2 = r**2
     B0 = B0_series(rho0, r2)*1/np.sqrt(2)
     # B2 = B2_series(rho0, r2)*1/np.sqrt(2)
-    E = [B0, B0]
+    E = [B0, 1j*B0]
+    return np.array(E)
+
+def E_field_sym_simplified(params):
+    r, rho0 = params
+    r2 = r**2
+    B0 = B0_series(rho0, r2)
+    # B2 = B2_series(rho0, r2)*1/np.sqrt(2)
+    E = B0
     return np.array(E)
 
 def intensity(Efield):
     return(np.abs(Efield[0])**2 + np.abs(Efield[1])**2)
-
 
 
 # first value for central and second for nearest neighbors
@@ -90,28 +97,28 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 100
-k_max = 100
+n = 50
+l = 50
 
 Z = 0
 
-p_list = np.linspace(0,5,100)
+p_list = np.linspace(0,8,l)
 rho0_list = np.linspace(0.8,5,n)
 
 # I0 = intensity(E_field((0,0,rho0)))
-Icross = np.zeros((len(rho0_list),len(p_list)))
+I = np.zeros((len(rho0_list),len(p_list)))
 step = 0
 
 
 
 for i,rho0 in enumerate(rho0_list):    
     for j, p in enumerate(p_list):
-        Ecross = E_field((0,rho0)) + 4* E_field((p,rho0)) #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
+        E = E_field_sym_simplified((0,rho0)) + 4* E_field_sym_simplified((p,rho0)) #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
 #     + E_field(2*p,0) + E_field(-2*p,0) + E_field(0,2*p) + E_field(0,-2*p)
 #     + E_field(2*p,p) + E_field(-2*p,-p) + E_field(2*p,-p) + E_field(-2*p,p)
 #     + E_field(p,2*p) + E_field(-p,-2*p) + E_field(-p,2*p) + E_field(p,-2*p))
-        Icross[i,j] = intensity(Ecross)
+        I[i,j] = np.abs(E)**2#intensity(Ecross)
     progress = (i+1)/len(rho0_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
@@ -123,7 +130,7 @@ Plot
 """
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 1)
+ga.reel_2D(p_list, rho0_list, I, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]

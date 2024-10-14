@@ -115,7 +115,7 @@ Plot
 """
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
-ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 1)
+ga.reel_2D(p_list, rho0_list, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)
 # rho_opt = rho0_list[np.argmin(Icross, axis = 0)]
