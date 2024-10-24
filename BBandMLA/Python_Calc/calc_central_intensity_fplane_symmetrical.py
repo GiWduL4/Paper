@@ -6,11 +6,9 @@ Created on Wed Oct  9 16:08:42 2024
 """
 
 import numpy as np
-import scipy.integrate as integrate
-import math as m
-import matplotlib.pyplot as plt
-import scipy.special as ss
-from decimal import Decimal
+# import scipy.integrate as integrate
+# import math as m
+# import matplotlib.pyplot as plt
 from mpmath import nsum, inf, fac, hyp1f1, mpf
 
 # Defining pathes for importing own modules
@@ -62,8 +60,8 @@ def E_field_sym(params):
     return np.array(E)
 
 def E_field_sym_simplified(params):
-    r, rho0 = params
-    r2 = r**2
+    r2, rho0 = params
+    # r2 = r**2
     B0 = B0_series(rho0, r2)
     # B2 = B2_series(rho0, r2)*1/np.sqrt(2)
     E = B0
@@ -97,8 +95,8 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 50
-l = 50
+n = 100
+l = 100
 
 Z = 0
 
@@ -115,15 +113,15 @@ step = 0
 for i,rho0 in enumerate(rho0_list):    
     for j, p2 in enumerate(p2_list):
         E[0,i,j] = E_field_sym_simplified((0,rho0)) 
-        E[1,i,j] =  E_field_sym_simplified((p2,rho0)) 
+        E[1,i,j] = E_field_sym_simplified((p2,rho0)) 
         E[2,i,j] =  E_field_sym_simplified((2*p2,rho0))
         E[3,i,j] =  E_field_sym_simplified((4*p2,rho0))
-        E[4,i,j] =  E_field_sym_simplified((5*p2,rho0))
-        E[5,i,j] =  E_field_sym_simplified((8*p2,rho0))
-        E[6,i,j] =  E_field_sym_simplified((9*p2,rho0))
-        E[7,i,j] =  E_field_sym_simplified((10*p2,rho0))
-        E[8,i,j] =  E_field_sym_simplified((13*p2,rho0))
-        E[9,i,j] =  E_field_sym_simplified((18*p2,rho0))
+        # E[4,i,j] =  E_field_sym_simplified((5*p2,rho0))
+        # E[5,i,j] =  E_field_sym_simplified((8*p2,rho0))
+        # E[6,i,j] =  E_field_sym_simplified((9*p2,rho0))
+        # E[7,i,j] =  E_field_sym_simplified((10*p2,rho0))
+        # E[8,i,j] =  E_field_sym_simplified((13*p2,rho0))
+        # E[9,i,j] =  E_field_sym_simplified((18*p2,rho0))
         
         #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
@@ -137,13 +135,13 @@ for i,rho0 in enumerate(rho0_list):
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
 
-I = (E[0]+4*E[1])**2    
+I = (E[0]+4*(E[1]))**2#+E[2]+E[3]+E[5]+E[6]+E[9])+8*(E[4]+E[7]+E[8]))**2    
 
 """
 Plot
 """
 
-# ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
+
 ga.reel_2D(p_list, rho0_list, I, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
 
 # Imin = np.min(Icross, axis = 0)

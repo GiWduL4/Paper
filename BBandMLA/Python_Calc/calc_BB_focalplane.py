@@ -137,19 +137,19 @@ Plot
 x = np.linspace(-5,5,401)
 y = np.linspace(-5,5,401)
 xm, ym = np.meshgrid(x,y)
-
+p=1.5
 for rho0 in rho0_list:
     B0pre = B0_pre(rho0)
     B2pre = B2_pre(rho0)
     print('prefactors calculated')
     # I0 = intensity(E_field(xm,ym))
-    E = E_field(xm,ym) #+ E_field(xm-p,ym) #+E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) +E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+    E = E_field(xm,ym) + E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
     r2 = xm**2 + ym**2
     A = np.where(r2>=4.666**2) #computable with numpy
     E[0][A] = 0
     E[1][A] = 0
     Icross = intensity(E)
-    ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 2)
+    ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 10)
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
