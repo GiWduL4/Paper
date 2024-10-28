@@ -133,10 +133,10 @@ def intensity(Efield):
 """
 Plot
 """
-x = np.linspace(-5,5,801)
-y = np.linspace(-5,5,801)
+x = np.linspace(-5,5,201)
+y = np.linspace(-5,5,201)
 xm, ym = np.meshgrid(x,y)
-n = 500
+n = 50
 rho0_list = np.linspace(0.5,5,n)
 E_list = []
 
@@ -161,7 +161,7 @@ for i,rho0 in enumerate(rho0_list):
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
 
-np.save('E_field_singletrap_for_various_rho_241027.npy', np.array(E_list))
+np.save('E_single_beam_test.npy', np.array(E_list))
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
