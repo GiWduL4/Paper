@@ -95,8 +95,8 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 100
-l = 100
+n = 500
+l = 500
 
 Z = 0
 
@@ -116,12 +116,12 @@ for i,rho0 in enumerate(rho0_list):
         E[1,i,j] = E_field_sym_simplified((p2,rho0)) 
         E[2,i,j] =  E_field_sym_simplified((2*p2,rho0))
         E[3,i,j] =  E_field_sym_simplified((4*p2,rho0))
-        # E[4,i,j] =  E_field_sym_simplified((5*p2,rho0))
-        # E[5,i,j] =  E_field_sym_simplified((8*p2,rho0))
-        # E[6,i,j] =  E_field_sym_simplified((9*p2,rho0))
-        # E[7,i,j] =  E_field_sym_simplified((10*p2,rho0))
-        # E[8,i,j] =  E_field_sym_simplified((13*p2,rho0))
-        # E[9,i,j] =  E_field_sym_simplified((18*p2,rho0))
+        E[4,i,j] =  E_field_sym_simplified((5*p2,rho0))
+        E[5,i,j] =  E_field_sym_simplified((8*p2,rho0))
+        E[6,i,j] =  E_field_sym_simplified((9*p2,rho0))
+        E[7,i,j] =  E_field_sym_simplified((10*p2,rho0))
+        E[8,i,j] =  E_field_sym_simplified((13*p2,rho0))
+        E[9,i,j] =  E_field_sym_simplified((18*p2,rho0))
         
         #+ E_field((-p,0,rho0)) + E_field((0,p,rho0)) + E_field((0,-p,rho0)) 
 #     + E_field(p,-p) + E_field(-p,-p) + E_field(-p,p) + E_field(p,p)
@@ -134,6 +134,7 @@ for i,rho0 in enumerate(rho0_list):
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
+np.save('E_field_center_of_array_241027.npy', E)
 
 I = (E[0]+4*(E[1]))**2#+E[2]+E[3]+E[5]+E[6]+E[9])+8*(E[4]+E[7]+E[8]))**2    
 
