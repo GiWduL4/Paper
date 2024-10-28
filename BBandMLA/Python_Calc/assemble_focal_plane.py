@@ -32,19 +32,21 @@ def intensity(Efield):
 """
 Choose parameters
 """
-rho0 = 1.2
+rho0 = 1.25
 p = 2.5
-setup = '5x5'
+setup = '3x3'
 
 """
 Loading calcs
 """
-x = np.linspace(-5,5,201)
-y = np.linspace(-5,5,201)
+H = np.load('test.npz')
+
+x = H['arr_0'] # np.linspace(-5,5,201)
+y = H['arr_1'] # np.linspace(-5,5,201)
 size = len(x)
 dx = x[1]-x[0]
-rho0_list = np.linspace(0.5,5,50)
-E_test = np.load('E_single_beam_test.npy')
+rho0_list = H['arr_2']    #np.linspace(0.5,5,50)
+E_test = H['arr_3']       #np.load('E_single_beam_test.npy') #WIP: add x,y,rho0_list to npy
 
 i = np.argmin(np.abs(rho0_list - rho0))
 print('Index ' + str(i) + ' with value ' + r'rho_0 = ' + str(round(rho0_list[i],3)))
@@ -79,6 +81,6 @@ I = intensity(E_full)
 Plotting
 """
 
-ga.reel_2D(x_full, y_full, I, xlabel='x/w', ylabel=r'y/w', vmax = 2)
+ga.reel_2D(x_full, y_full, I, xlabel='x/w', ylabel=r'y/w', vmax = 6)
 
  

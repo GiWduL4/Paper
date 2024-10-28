@@ -133,10 +133,10 @@ def intensity(Efield):
 """
 Plot
 """
-x = np.linspace(-5,5,201)
-y = np.linspace(-5,5,201)
+x = np.linspace(-8,8,201)
+y = np.linspace(-8,8,201)
 xm, ym = np.meshgrid(x,y)
-n = 50
+n = 5
 rho0_list = np.linspace(0.5,5,n)
 E_list = []
 
@@ -150,18 +150,18 @@ for i,rho0 in enumerate(rho0_list):
     # I0 = intensity(E_field(xm,ym))
     E = E_field(xm,ym) #+ E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
     r2 = xm**2 + ym**2
-    A = np.where(r2>=4.666**2) #computable with numpy
-    E[0][A] = 0
-    E[1][A] = 0
+    # A = np.where(r2>=4.666**2) #computable with numpy
+    # E[0][A] = 0
+    # E[1][A] = 0
     E_list.append(E)
-    # Icross = intensity(E)
-    # ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 1)
+    Icross = intensity(E)
+    ga.reel_2D(x, y, Icross, xlabel='x', ylabel=r'y', vmax = 1)
     progress = (i+1)/len(rho0_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
         step += 0.1
 
-np.save('E_single_beam_test.npy', np.array(E_list))
+np.save('E_single_beam_241028_1633.npy', np.array(E_list))
 
 # ga.reel_2D(p_list, rho0_list, I0, xlabel='pitch', ylabel=r'$\rho_0$')
 # ga.reel_2D(p_list, rho0, Icross, xlabel='pitch', ylabel=r'$\rho_0$', vmax = 10)
