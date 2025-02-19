@@ -14,14 +14,14 @@ import scipy.special as ss
 E0 = 1
 
 def integrand_real(t, Z, rho0, k):
-    return(np.real(t*np.exp(-t**2/4*(1+1j*Z))*np.cos(t*rho0)*(t/2)**(2*k)))        
+    return(np.real(t*np.exp(-t**2/4*(1+1j*Z))*np.sin(t*rho0)*(t/2)**(2*k+1)))        
 def integrand_imag(t, Z, rho0, k):
-    return(np.imag(t*np.exp(-t**2/4*(1+1j*Z))*np.cos(t*rho0)*(t/2)**(2*k)))        
+    return(np.imag(t*np.exp(-t**2/4*(1+1j*Z))*np.sin(t*rho0)*(t/2)**(2*k+1)))        
 
 n = 200
 
-Z = 0
-k = 30
+Z = 1
+k = 1
 rho0_list = np.linspace(0,5,n)
 """
 Integral
@@ -32,15 +32,15 @@ K = np.zeros(n)
 for j in range(n):
     rho0 = rho0_list[j]
     result0 = integrate.quad(integrand_real, 0, np.inf, args = (Z,rho0,k))
-    H[j] = 1/(m.factorial(k)) * result0[0]
+    H[j] = 1/(m.factorial(k+1)) * result0[0]
     result1 = integrate.quad(integrand_imag, 0, np.inf, args = (Z,rho0,k))
-    K[j] = 1/(m.factorial(k)) * result1[0]
+    K[j] = 1/(m.factorial(k+1)) * result1[0]
 
 """
 Kummer
 """
 x3 = -rho0_list**2/(1+1j*Z)
-L = 2/(1+1j*Z)**(1+k) * ss.hyp1f1(k+1, 1/2, x3)
+L = (4*rho0_list)/(1+1j*Z)**(2+k) * ss.hyp1f1(k+2, 3/2, x3)
 M = np.real(L)
 N = np.imag(L)
 
