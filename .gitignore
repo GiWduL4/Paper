@@ -2,3 +2,5 @@
 *.npy
 
 BBandMLA/Python_Calc/__pycache__/
+
+*.pyc

@@ -95,8 +95,8 @@ def intensity(Efield):
 
 E0 = 1       
 
-n = 500
-l = 500
+n = 50
+l = 50
 
 Z = 0
 

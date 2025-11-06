@@ -32,8 +32,8 @@ def intensity(Efield):
 """
 Choose parameters
 """
-rho0 = 1.25
-p = 2.5
+rho0 = 0.924
+p = 8
 setup = '3x3'
 
 """
@@ -81,6 +81,6 @@ I = intensity(E_full)
 Plotting
 """
 
-ga.reel_2D(x_full, y_full, I, xlabel='x/w', ylabel=r'y/w', vmax = 6)
+ga.reel_2D(x_full, y_full, I, xlabel='x/w', ylabel=r'y/w', vmax = 1.54)
 
  
