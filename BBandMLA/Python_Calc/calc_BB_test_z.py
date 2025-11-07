@@ -36,7 +36,7 @@ p_list = [1]#np.linspace(0,5.5,500)
 """
 B0 and B2; case Z = 0
 """
-def B0_pre(rho0):
+def B0_pre(rho0,Z):
     # Ensure rho0 is an array (even if it's a single scalar value)
     rho0 = np.atleast_1d(rho0)
     
@@ -53,7 +53,7 @@ def B0_pre(rho0):
     #     return B0_prefactor[0]
     return B0_prefactor
 
-def B0_calc(r2):
+def B0_calc(r2,Z):
     B0 = 0
     for k in range(k_max):
         B0 += B0pre[:,k]*(-r2)**k/(1+1j*Z)**(k+1)
@@ -61,7 +61,7 @@ def B0_calc(r2):
     B0 = 2 * B0
     return(B0)
 
-def B2_pre(rho0):
+def B2_pre(rho0,Z):
     # Ensure rho0 is an array (even if it's a single scalar value)
     rho0 = np.atleast_1d(rho0)
     
@@ -78,7 +78,7 @@ def B2_pre(rho0):
     #     return B2_prefactor[0]
     return B2_prefactor
 
-def B2_calc(r2):
+def B2_calc(r2,Z):
     B2 = 0
     for k in range(k_max):
         B2 += B2pre[:,k]*(-r2)**k/(1+1j*Z)**(k+2)
@@ -88,11 +88,11 @@ def B2_calc(r2):
 
 
 
-def E_field(x,y):
+def E_field(x,y,Z):
     E = [0,0]
     r2 = x**2 + y**2
-    B0 = B0_calc(r2)
-    B2 = B2_calc(r2)
+    B0 = B0_calc(r2,Z)
+    B2 = B2_calc(r2,Z)
     E[0] = B0 + B2*x + 1j*B2*y
     E[1] = B2*y + 1j* B0 -1j*B2*x
     return(np.array(E))
@@ -150,11 +150,11 @@ E_list = []
 step = 0
 
 for i,rho0 in enumerate(rho0_list):
-    B0pre = B0_pre(rho0)
-    B2pre = B2_pre(rho0)
+    B0pre = B0_pre(rho0, Z)
+    B2pre = B2_pre(rho0, Z)
     # print('prefactors calculated')
     # I0 = intensity(E_field(xm,ym))
-    E = E_field(xm,ym) #+ E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+    E = E_field(xm,ym,Z) #+ E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
     r2 = xm**2 + ym**2
     A = np.where(r2>=5**2) #computable with numpy
     E[0][A] = 0
