@@ -31,7 +31,7 @@ E0 = 1
 
 k_max = 101
 
-Z = 0
+Z = 1.133
 p_list = [1]#np.linspace(0,5.5,500)
 """
 B0 and B2; case Z = 0
@@ -46,17 +46,17 @@ def B0_pre(rho0,Z):
     for i, r in enumerate(rho0):
         x3 = -r**2/(1+1j*Z)
         for k in range(k_max):
-            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3)/ss.factorial(k)#/(1+1j*Z)**(k+1))
+            B0_prefactor[i, k] = ss.hyp1f1(k+1, 1/2, x3)/ (ss.factorial(k) * (1+1j*Z)**(k+1))
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B0_prefactor.shape[0] == 1:
     #     return B0_prefactor[0]
     return B0_prefactor
 
-def B0_calc(r2,Z):
+def B0_calc(r2):
     B0 = 0
     for k in range(k_max):
-        B0 += B0pre[:,k]*(-r2)**k/(1+1j*Z)**(k+1)
+        B0 += B0pre[:,k]*(-r2)**k#/(1+1j*Z)**(k+1)
         # print(type(B0))
     B0 = 2 * B0
     return(B0)
@@ -71,28 +71,28 @@ def B2_pre(rho0,Z):
     for i, r in enumerate(rho0):
         x3 = -r**2/(1+1j*Z)
         for k in range(k_max):
-            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) / ss.factorial(k)#/(1+1j*Z)**(k+2))
+            B2_prefactor[i, k] = ss.hyp1f1(k+2, 3/2, x3) / (ss.factorial(k) * (1+1j*Z)**(k+2))
     
     # If rho0 was a scalar, return a 1D array instead of 2D
     # if B2_prefactor.shape[0] == 1:
     #     return B2_prefactor[0]
     return B2_prefactor
 
-def B2_calc(r2,Z):
+def B2_calc(r2):
     B2 = 0
     for k in range(k_max):
-        B2 += B2pre[:,k]*(-r2)**k/(1+1j*Z)**(k+2)
+        B2 += B2pre[:,k]*(-r2)**k#/(1+1j*Z)**(k+2)
         # print(type(B0))
     B2 = 4 * rho0 * B2
     return(B2)
 
 
 
-def E_field(x,y,Z):
+def E_field(x,y):
     E = [0,0]
     r2 = x**2 + y**2
-    B0 = B0_calc(r2,Z)
-    B2 = B2_calc(r2,Z)
+    B0 = B0_calc(r2)
+    B2 = B2_calc(r2)
     E[0] = B0 + B2*x + 1j*B2*y
     E[1] = B2*y + 1j* B0 -1j*B2*x
     return(np.array(E))
@@ -143,29 +143,34 @@ Plot
 x = np.linspace(-5,5,301)
 y = np.linspace(-5,5,301)
 xm, ym = np.meshgrid(x,y)
-n = 51
+n = 21
+nz = 11
 rho0_list = np.linspace(0.824,1.024,n)
-E_list = []
+z_list = np.linspace(0,2,n)
 
-step = 0
+E_list = []
+step = 0.05
 
 for i,rho0 in enumerate(rho0_list):
-    B0pre = B0_pre(rho0, Z)
-    B2pre = B2_pre(rho0, Z)
-    # print('prefactors calculated')
-    # I0 = intensity(E_field(xm,ym))
-    E = E_field(xm,ym,Z) #+ E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
-    r2 = xm**2 + ym**2
-    A = np.where(r2>=5**2) #computable with numpy
-    E[0][A] = 0
-    E[1][A] = 0
-    E_list.append(E)
-    I = intensity(E)
-    ga.reel_2D(x, y, I, xlabel='x', ylabel=r'y')#, vmax = 100)
+    E_z = []
+    for j,Z in enumerate(z_list):
+        B0pre = B0_pre(rho0, Z)
+        B2pre = B2_pre(rho0, Z)
+        print('prefactors calculated')
+        # I0 = intensity(E_field(xm,ym))
+        E = E_field(xm,ym) #+ E_field(xm-p,ym) +E_field(xm+p,ym) +E_field(xm,ym+p) +E_field(xm,ym-p) #+E_field(xm-p,ym-p)+E_field(xm-p,ym+p)+E_field(xm+p,ym+p)+E_field(xm+p,ym-p)
+        r2 = xm**2 + ym**2
+        A = np.where(r2>=5**2) #computable with numpy
+        E[0][A] = 0
+        E[1][A] = 0
+        E_z.append(E)
+        I = intensity(E)
+        ga.reel_2D(x, y, I, xlabel='x', ylabel=r'y')#, vmax = 100)
+    E_list.append(E_z)
     progress = (i+1)/len(rho0_list)
     if progress >= step:
         print('Progress: ' + str(round(progress*100,3)) + ' %')
-        step += 0.1
+        step += 0.05
 
 np.save('E_single_beam_test.npy', np.array(E_list))
 
